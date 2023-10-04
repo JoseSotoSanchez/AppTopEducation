@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Estudiante</title>
+</head>
+<body>
+<h1>Formulario de Estudiante</h1>
+<form action="#" th:action="@{/guardarEstudiante}" th:object="${estudiante}" method="post">
+    <label>Rut: <input type="text" th:field="*{rut}" /></label><br/>
+    <label>Apellidos: <input type="text" th:field="*{apellidos}" /></label><br/>
+    <label>Nombres: <input type="text" th:field="*{nombres}" /></label><br/>
+    <label>Fecha de Nacimiento: <input type="date" th:field="*{fecha_nacimiento}" /></label><br/>
+    <label>Tipo de Colegio de Procedencia: <input type="text" th:field="*{tipo_colegio_procedencia}" /></label><br/>
+    <label>Nombre del Colegio: <input type="text" th:field="*{nombre_colegio}" /></label><br/>
+    <label>Año de Egreso: <input type="number" th:field="*{anio_egreso}" /></label><br/>
+    <button type="submit">Guardar</button>
+</form>
+</body>
+</html>
