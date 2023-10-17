@@ -22,8 +22,56 @@ public class PagoEntity {
     private TipoPagoEntity id_tipo_pago;
 
     @ManyToOne
-    @JoinColumn(name = "id_arancel")
-    private ArancelEntity id_arancel;
+    @JoinColumn(name = "id_estudiante")
+    private EstudianteEntity id_estudiante;
 
     // Getters y setters
+
+    public Long getId_pago() {
+        return id_pago;
+    }
+
+    public void setId_pago(Long id_pago) {
+        this.id_pago = id_pago;
+    }
+
+    public int getMontoPago() {
+        return montoPago;
+    }
+
+    public void setMontoPago(int montoPago) {
+        this.montoPago = montoPago;
+    }
+
+    public int getNumero_cuota() {
+        return numero_cuota;
+    }
+
+    public void setNumero_cuota(int numero_cuota) {
+        this.numero_cuota = numero_cuota;
+    }
+
+    public int getFecha_pago() {
+        return fecha_pago;
+    }
+
+    public void setFecha_pago(int fecha_pago) {
+        this.fecha_pago = fecha_pago;
+    }
+
+    public TipoPagoEntity getId_tipo_pago() {
+        return id_tipo_pago;
+    }
+
+    public void setId_tipo_pago(TipoPagoEntity id_tipo_pago) {
+        this.id_tipo_pago = id_tipo_pago;
+    }
+
+    public EstudianteEntity getId_estudiante() {
+        return id_estudiante;
+    }
+
+    public void setId_estudiante(EstudianteEntity id_estudiante) {
+        this.id_estudiante = id_estudiante;
+    }
 }

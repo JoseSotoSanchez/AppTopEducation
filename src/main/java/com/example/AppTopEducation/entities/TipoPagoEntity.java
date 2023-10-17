@@ -16,4 +16,20 @@ public class TipoPagoEntity {
     private String detalle;
 
     // Getters y setters
+
+    public Long getId_tipo_pago() {
+        return id_tipo_pago;
+    }
+
+    public void setId_tipo_pago(Long id_tipo_pago) {
+        this.id_tipo_pago = id_tipo_pago;
+    }
+
+    public String getDetalle() {
+        return detalle;
+    }
+
+    public void setDetalle(String detalle) {
+        this.detalle = detalle;
+    }
 }

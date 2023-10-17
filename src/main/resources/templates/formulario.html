@@ -1,22 +1,51 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" >
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de Estudiante</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
-<h1>Formulario de Estudiante</h1>
-<form action="#" th:action="@{/guardarEstudiante}" th:object="${estudiante}" method="post">
-    <label>Rut: <input type="text" th:field="*{rut}" /></label><br/>
-    <label>Apellidos: <input type="text" th:field="*{apellidos}" /></label><br/>
-    <label>Nombres: <input type="text" th:field="*{nombres}" /></label><br/>
-    <label>Fecha de Nacimiento: <input type="date" th:field="*{fecha_nacimiento}" /></label><br/>
-    <label>Tipo de Colegio de Procedencia: <input type="text" th:field="*{tipo_colegio_procedencia}" /></label><br/>
-    <label>Nombre del Colegio: <input type="text" th:field="*{nombre_colegio}" /></label><br/>
-    <label>Año de Egreso: <input type="number" th:field="*{anio_egreso}" /></label><br/>
-    <button type="submit">Guardar</button>
-</form>
+<div class="container">
+    <h1 class="mt-5">Formulario de Estudiante</h1>
+    <form action="#" th:action="@{/guardarEstudiante}" th:object="${estudiante}" method="post">
+        <div class="form-group">
+            <label>Rut:</label>
+            <input type="text" class="form-control" th:field="*{rut}" />
+        </div>
+        <div class="form-group">
+            <label>Apellidos:</label>
+            <input type="text" class="form-control" th:field="*{apellidos}" />
+        </div>
+        <div class="form-group">
+            <label>Nombres:</label>
+            <input type="text" class="form-control" th:field="*{nombres}" />
+        </div>
+        <div class="form-group">
+            <label>Fecha de Nacimiento:</label>
+            <input type="date" class="form-control" th:field="*{fecha_nacimiento}" />
+        </div>
+        <div class="form-group">
+            <label>Tipo de Colegio de Procedencia:</label>
+            <select class="form-control" th:field="*{tipo_colegio_procedencia}">
+                <option value="MUNICIPAL">Municipal</option>
+                <option value="SUBVENCIONADO">Subvencionado</option>
+                <option value="PRIVADO">Privado</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Nombre del Colegio:</label>
+            <input type="text" class="form-control" th:field="*{nombre_colegio}" />
+        </div>
+        <div class="form-group">
+            <label>Año de Egreso:</label>
+            <input type="number" class="form-control" th:field="*{anio_egreso}" />
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
 </body>
 </html>
