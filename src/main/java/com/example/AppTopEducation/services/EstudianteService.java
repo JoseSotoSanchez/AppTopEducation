@@ -1,12 +1,16 @@
 package com.example.AppTopEducation.services;
 import com.example.AppTopEducation.entities.ArancelEntity;
 import com.example.AppTopEducation.entities.EstudianteEntity;
+import com.example.AppTopEducation.entities.PagoEntity;
 import com.example.AppTopEducation.repositories.ArancelRepository;
 import com.example.AppTopEducation.repositories.EstudianteRepository;
+import com.example.AppTopEducation.repositories.PagoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,11 +18,13 @@ import java.util.Optional;
 public class EstudianteService {
     private final EstudianteRepository estudianteRepository;
     private final ArancelRepository arancelRepository;
+    private final PagoRepository pagoRepository;
 
     @Autowired
-    public EstudianteService(EstudianteRepository estudianteRepository, ArancelRepository arancelRepository) {
+    public EstudianteService(EstudianteRepository estudianteRepository, ArancelRepository arancelRepository, PagoRepository pagoRepository) {
         this.estudianteRepository = estudianteRepository;
         this.arancelRepository = arancelRepository;
+        this.pagoRepository = pagoRepository;
     }
 
     public EstudianteEntity guardarEstudiante(EstudianteEntity estudiante) {
@@ -49,12 +55,32 @@ public class EstudianteService {
         arancelEstudiante = arancelEstudiante - descuentoTotalArancel;
         arancel.setMonto_total(arancelEstudiante);
 
+        int valorCuota = arancelEstudiante / numeroCuotas;
         arancel.setNumero_cuotas(numeroCuotas);
         arancelRepository.save(arancel);
         Optional<EstudianteEntity> estudianteOptional = estudianteRepository.findById(idEstudiante);
         EstudianteEntity estudiante = estudianteOptional.orElse(new EstudianteEntity());
         estudiante.setArancel(arancel);
-        estudianteRepository.save(estudiante);
+        var estudianteSv = estudianteRepository.save(estudiante);
+
+        Date fechaActual = new Date();
+        for (int i = 1; i <= numeroCuotas ;i++){
+            PagoEntity pago = new PagoEntity();
+            pago.setNumero_cuota(i);
+            pago.setId_estudiante(estudianteSv);
+            pago.setMontoPago(valorCuota);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(fechaActual);
+            calendar.add(Calendar.MONTH, 1);
+            calendar.set(Calendar.DAY_OF_MONTH, 5);
+            fechaActual = calendar.getTime();
+            pago.setFecha_vencimiento(fechaActual);
+            try {
+                pagoRepository.save(pago);
+            }catch (Exception ex){
+                System.out.println(ex);
+            }
+        }
         return true;
     }
 }

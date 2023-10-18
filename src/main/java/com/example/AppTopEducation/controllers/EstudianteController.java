@@ -51,6 +51,6 @@ public class EstudianteController {
     public String mostrarDetallesEstudiante(@PathVariable Long id, Model model) {
         Optional<EstudianteEntity> estudiante = estudianteService.obtenerEstudiantePorId(id);
         model.addAttribute("estudiante", estudiante);
-        return "listaEstudiantes"; // El nombre de tu archivo HTML
+        return "listaEstudiantes";
     }
 }

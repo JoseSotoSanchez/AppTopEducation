@@ -4,23 +4,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Estudiantes</title>
+    <title>Lista de Pagos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script th:inline="javascript">
         var estudiantes = /*[[${estudiantes}]]*/ [];
-        function filterTable() {
-            var searchTerm = document.getElementById("searchInput").value.toLowerCase();
-            var filteredEstudiantes = estudiantes.filter(function(estudiante) {
-                return estudiante.nombres.toLowerCase().includes(searchTerm) ||
-                       estudiante.apellidos.toLowerCase().includes(searchTerm) ||
-                       estudiante.rut.toLowerCase().includes(searchTerm) ||
-                       estudiante.fecha_nacimiento.includes(searchTerm);
-            });
-            fillTable(filteredEstudiantes);
-        }
 
         function cerrarModal(){
             $('#myModal').modal('hide');
@@ -45,67 +35,20 @@
         }
 
         $(document).ready(function() {
-            $('.crear-cuotas-btn').on('click', function() {
-                selectCantidadCuotas.innerHTML = "";
+            $('.ver-historial-btn').on('click', function() {
                 var estudianteId = $(this).data('id-estudiante');
-                var estudianteNombres = $(this).data('nombres');
-                var estudianteApellidos = $(this).data('apellidos');
                 var estudianteRut = $(this).data('rut');
-                var estudianteTipoColegio = $(this).data('tipo-colegio');
-                var estudianteAnioEgreso = $(this).data('anio-egreso');
 
                 $('#estudianteId').text(estudianteId);
-                $('#estudianteNombres').text(estudianteNombres);
-                $('#estudianteApellidos').text(estudianteApellidos);
                 $('#estudianteRut').text(estudianteRut);
-                $('#estudianteTipoColegio').text(estudianteTipoColegio);
-                $('#estudianteAnioEgreso').text(estudianteAnioEgreso);
-                var estudianteTipoColegioElement = document.getElementById("estudianteTipoColegio");
-                var estudianteTipoColegio = estudianteTipoColegioElement.textContent.trim().toLowerCase();
-                console.log("Tipo colegio");
-                console.log(estudianteTipoColegio);
-                var cuotas = [];
-                if (estudianteTipoColegio === "municipal") {
-                    cuotas.push(4);
-                    cuotas.push(7);
-                    cuotas.push(10);
-                } else if (estudianteTipoColegio === "subvencionado") {
-                    cuotas.push(4);
-                    cuotas.push(7);
-                } else if (estudianteTipoColegio === "privado") {
-                    cuotas.push(4);
-                }
-                var optionUnaCuota = document.createElement("option");
-                optionUnaCuota.value = 1;
-                optionUnaCuota.text = "1 (contado)";
-                selectCantidadCuotas.appendChild(optionUnaCuota);
-                console.log(cuotas);
-                cuotas.forEach(function(cuota) {
-                    var option = document.createElement("option");
-                    option.value = cuota;
-                    option.text = cuota + " (cuotas)";
-                    selectCantidadCuotas.appendChild(option);
-                });
+                obtenerPagos(estudianteId);
+
                 $('#myModal').modal('show');
             });
         });
 
-        function guardarCuotasEstudiante(){
-            var estudianteId = document.getElementById("estudianteId").innerText;
-            var estudianteTipoColegio = document.getElementById("estudianteTipoColegio").innerText;
-            var estudianteAnioEgreso = document.getElementById("estudianteAnioEgreso").innerText;
-            var cantidadCuotas = document.getElementById("selectCantidadCuotas").value;
-
-            console.log("ID del estudiante: " + estudianteId);
-            console.log("tipo colegio: " + estudianteTipoColegio);
-            console.log("Anio egreso: " + estudianteAnioEgreso);
-            console.log("Cantidad de Cuotas: " + cantidadCuotas);
-
-            llamarEndpoint(estudianteId, estudianteTipoColegio, estudianteAnioEgreso, cantidadCuotas);
-        }
-
-        function llamarEndpoint(estudianteId, estudianteTipoColegio, estudianteAnioEgreso, cantidadCuotas) {
-            var url = "/agregarCuota/"+estudianteId+"/tipoColegio/"+estudianteTipoColegio+"/anioEgreso/"+estudianteAnioEgreso+"/ncuotas/"+cantidadCuotas;
+        function obtenerPagos(estudianteId) {
+            var url = "/pagosEstudiante/" + estudianteId;
 
             fetch(url, {
                 method: "GET",
@@ -120,21 +63,109 @@
                 return response.json();
             })
             .then(data => {
-                console.log("Respuesta del servidor:", data);
+                console.log("Lista de pagos del estudiante:", data);
+                mostrarPagosEnTabla(data);
             })
             .catch(error => {
                 console.error("Error:", error);
             });
         }
+
+        function mostrarPagosEnTabla(pagos) {
+            var tabla = document.createElement("table");
+            tabla.classList.add("table");
+
+            var encabezados = ["Fecha de pago", "Fecha de vencimiento", "Número de Cuota", "Monto", "Estado"];
+            var encabezadoRow = document.createElement("tr");
+            encabezados.forEach(function(encabezado) {
+                var th = document.createElement("th");
+                th.textContent = encabezado;
+                encabezadoRow.appendChild(th);
+            });
+            tabla.appendChild(encabezadoRow);
+
+            pagos.forEach(function(pago) {
+                var fila = document.createElement("tr");
+
+                var fechaPagoCell = document.createElement("td");
+                if(pago.fecha_pago == null){
+                    fechaPagoCell.textContent = "-";
+                }else{
+                    var fechaPago = new Date(pago.fecha_pago);
+                    var opcionesFormatoPago = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                    fechaPagoCell.textContent = fechaPago.toLocaleDateString(undefined, opcionesFormatoPago);
+                }
+                fila.appendChild(fechaPagoCell);
+
+                var fechaVencimientoCell = document.createElement("td");
+                var fechaVencimiento = new Date(pago.fecha_vencimiento);
+                var opcionesFormato = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                fechaVencimientoCell.textContent = fechaVencimiento.toLocaleDateString(undefined, opcionesFormato);
+                fila.appendChild(fechaVencimientoCell);
+
+                var numeroCuotaCell = document.createElement("td");
+                numeroCuotaCell.textContent = pago.numero_cuota;
+                fila.appendChild(numeroCuotaCell);
+
+                var montoCell = document.createElement("td");
+                montoCell.textContent = pago.montoPago;
+                fila.appendChild(montoCell);
+
+                var estadoCell = document.createElement("td");
+                if(pago.fecha_pago == null){
+                    estadoCell.textContent = "Sin pago";
+                }else{
+                    estadoCell.textContent = "Pagado";
+                }
+                fila.appendChild(estadoCell);
+
+                var pagarCell = document.createElement("td");
+                var pagarButton = document.createElement("button");
+                pagarButton.textContent = "Pagar";
+                pagarButton.classList.add("btn", "btn-primary");
+                pagarButton.onclick = function() {
+                    pagarCuota(pago.id_pago);
+                };
+                pagarCell.appendChild(pagarButton);
+                fila.appendChild(pagarCell);
+
+                tabla.appendChild(fila);
+            });
+
+            var contenedorTabla = document.getElementById("contenedor-tabla");
+            contenedorTabla.innerHTML = "";
+            contenedorTabla.appendChild(tabla);
+        }
+
+        function pagarCuota(idPago) {
+            var url = "/pagarCuota/" + idPago;
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error al pagar la cuota");
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Cuota pagada correctamente:", data);
+            })
+            .catch(error => {
+                console.error("Error al pagar la cuota:", error);
+            });
+        }
+
+
     </script>
 </head>
 <body>
 <div class="container mt-5">
-    <h1>Lista de Estudiantes</h1>
-    <form class="form-inline mt-3 mb-3">
-        <input class="form-control mr-sm-2" type="search" placeholder="Buscar estudiantes" aria-label="Buscar" id="searchInput">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="filterTable()">Buscar</button>
-    </form>
+    <h1>Lista de Pagos</h1>
     <table class="table table-striped mt-3">
         <thead class="thead-dark">
         <tr>
@@ -148,7 +179,7 @@
         </tr>
         </thead>
         <tbody id="tableBody">
-        <tr th:each="estudiante : ${estudiantes}" th:unless="${estudiante.arancel != null}">
+        <tr th:each="estudiante : ${estudiantes}">
             <td th:text="${estudiante.nombres}"></td>
             <td th:text="${estudiante.apellidos}"></td>
             <td th:text="${estudiante.rut}"></td>
@@ -156,7 +187,7 @@
             <td th:text="${estudiante.tipo_colegio_procedencia}"></td>
             <td th:text="${estudiante.anio_egreso}"></td>
             <td>
-                <a class="btn btn-primary btn-sm crear-cuotas-btn"
+                <a class="btn btn-primary btn-sm ver-historial-btn"
                    th:attr="data-id-estudiante=${estudiante.id_estudiante},
                    data-nombres=${estudiante.nombres},
                    data-apellidos=${estudiante.apellidos},
@@ -164,7 +195,7 @@
                    data-tipo-colegio=${estudiante.tipo_colegio_procedencia},
                    data-anio-egreso=${estudiante.anio_egreso}"
                    data-toggle="modal" data-target="#myModal">
-                    Crear cuotas de pago
+                    Ver pagos y pendientes
                 </a>
             </td>
         </tr>
@@ -182,17 +213,11 @@
             </div>
             <div class="modal-body">
                 <p>ID del Estudiante: <span id="estudianteId"></span></p>
-                <p>Nombres: <span id="estudianteNombres"></span></p>
-                <p>Apellidos: <span id="estudianteApellidos"></span></p>
                 <p>Rut: <span id="estudianteRut"></span></p>
-                <p>Tipo Colegio Procedencia: <span id="estudianteTipoColegio"></span></p>
-                <p>Año de agreso: <span id="estudianteAnioEgreso"></span></p>
-                <select id="selectCantidadCuotas">
-                </select>
             </div>
+            <div id="contenedor-tabla"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="guardarCuotasEstudiante()">Guardar cuotas</button>
             </div>
         </div>
     </div>

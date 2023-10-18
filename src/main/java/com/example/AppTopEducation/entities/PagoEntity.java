@@ -3,6 +3,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 
 @Entity
 @Table(name = "pago")
@@ -15,9 +18,13 @@ public class PagoEntity {
     private Long id_pago;
     private int montoPago;
     private int numero_cuota;
-    private int fecha_pago;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(nullable = true)
+    private Date fecha_pago;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date fecha_vencimiento;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "id_tipo_pago")
     private TipoPagoEntity id_tipo_pago;
 
@@ -51,14 +58,6 @@ public class PagoEntity {
         this.numero_cuota = numero_cuota;
     }
 
-    public int getFecha_pago() {
-        return fecha_pago;
-    }
-
-    public void setFecha_pago(int fecha_pago) {
-        this.fecha_pago = fecha_pago;
-    }
-
     public TipoPagoEntity getId_tipo_pago() {
         return id_tipo_pago;
     }
@@ -73,5 +72,17 @@ public class PagoEntity {
 
     public void setId_estudiante(EstudianteEntity id_estudiante) {
         this.id_estudiante = id_estudiante;
+    }
+
+    public void setFecha_pago(Date fecha_pago) {
+        this.fecha_pago = fecha_pago;
+    }
+
+    public Date getFecha_vencimiento() {
+        return fecha_vencimiento;
+    }
+
+    public void setFecha_vencimiento(Date fecha_vencimiento) {
+        this.fecha_vencimiento = fecha_vencimiento;
     }
 }
